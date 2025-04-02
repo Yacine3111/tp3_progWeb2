@@ -1,0 +1,59 @@
+﻿@model IEnumerable<UtilisateursIndexViewModel>
+
+@{
+	ViewData["Title"] = "Liste d'utilisateurs - Vue administrateur";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+	<a asp-action="Create" class="btn btn-primary">Créer un nouvel utilisateur</a>
+</p>
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayNameFor(model => model.Prenom)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Nom)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Pseudonyme)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.Courriel)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.MotDePasseActuel)
+			</th>
+			<th>Modifier</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@Html.DisplayFor(modelItem => item.Prenom)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Nom)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Pseudonyme)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.Courriel)
+				</td>
+				<td>
+					@Html.DisplayFor(modelItem => item.MotDePasseActuel)
+				</td>
+				<td>
+					<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-secondary me-1"><i class="bi-pencil-square"></i>Utilisateur</a>
+					<a asp-action="EditPassword" asp-route-id="@item.Id" class="btn btn-warning"><i class="bi-lock"></i>Mot de passe</a>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
