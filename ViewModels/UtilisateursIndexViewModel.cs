@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace TP3.ViewModels
+﻿namespace TP3.ViewModels
 {
     public class UtilisateursIndexViewModel
     {
@@ -13,6 +11,8 @@ namespace TP3.ViewModels
         public required string Pseudonyme { get; set; }
 
         public string? Courriel { get; set; }
+
+        public bool InfoLettre { get; set; }
 
         public required string MotDePasseActuel { get; set; }
     }

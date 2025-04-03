@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TP3.Data;
 using TP3.Models;
@@ -28,16 +23,18 @@ namespace TP3.Controllers
                 Id = u.Id,
                 Courriel = u.Courriel,
                 Nom = u.Nom,
+                InfoLettre = u.InfoLettre,
                 Prenom = u.Prenom,
                 Pseudonyme = u.Pseudonyme,
                 MotDePasseActuel = u.MotDePasseActuel,
             });
-                
+
             return View(vm);
         }
 
         public IActionResult Create()
         {
+
             return View();
         }
 
@@ -45,12 +42,40 @@ namespace TP3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UtilisateursCreateViewModel vm)
         {
+            bool hasError = false;
+
+            if (!ModelState.IsValid)
+            {
+                hasError = true;
+            }
+
+            var utilisateurs = await _context.Utilisateurs.ToListAsync();
+
+
+            if (utilisateurs.Any(u => u.Pseudonyme == vm.Pseudonyme))
+            {
+                ModelState.AddModelError(nameof(UtilisateursCreateViewModel.Pseudonyme), "Ce pseudonyme est déjà utilisé.");
+                hasError = true;
+            }
+
+            if (utilisateurs.Any(u => u.Courriel == vm.Courriel && vm.Courriel != null))
+            {
+                ModelState.AddModelError(nameof(UtilisateursCreateViewModel.Courriel), "Ce courriel est déjà utilisé.");
+                hasError = true;
+            }
+
+            if (hasError)
+            {
+                return View(vm);
+            }
+
             var utilisateur = new Utilisateur
-            {   
+            {
                 Prenom = vm.Prenom,
                 Nom = vm.Nom,
                 Pseudonyme = vm.Pseudonyme,
                 Courriel = vm.Courriel,
+                InfoLettre = vm.InfoLettre,
                 MotDePasseActuel = vm.MotDePasseNouveau,
             };
 
@@ -79,7 +104,9 @@ namespace TP3.Controllers
                 Prenom = utilisateur.Prenom,
                 Nom = utilisateur.Nom,
                 Pseudonyme = utilisateur.Pseudonyme,
-                Courriel = utilisateur.Courriel
+                Courriel = utilisateur.Courriel,
+                InfoLettre = utilisateur.InfoLettre
+
             };
             return View(vm);
         }
@@ -88,6 +115,31 @@ namespace TP3.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UtilisateursEditViewModel vm)
         {
+            bool hasError = false;
+            if (!ModelState.IsValid)
+            {
+                hasError = true;
+            }
+
+            var utilisateurs = await _context.Utilisateurs.ToListAsync();
+
+            if (utilisateurs.Any(u => u.Pseudonyme == vm.Pseudonyme && u.Id != vm.Id))
+            {
+                ModelState.AddModelError(nameof(UtilisateursCreateViewModel.Pseudonyme), "Ce pseudonyme est déjà utilisé.");
+                hasError = true;
+            }
+
+            if (utilisateurs.Any(u => u.Courriel == vm.Courriel && u.Id != vm.Id && vm.Courriel != null))
+            {
+                ModelState.AddModelError(nameof(UtilisateursCreateViewModel.Courriel), "Ce courriel est déjà utilisé.");
+                hasError = true;
+            }
+
+            if (hasError)
+            {
+                return View(vm);
+            }
+
             var utilisateurExistant = _context.Utilisateurs.Find(vm.Id);
 
             if (utilisateurExistant == null)
@@ -99,6 +151,7 @@ namespace TP3.Controllers
             utilisateurExistant.Nom = vm.Nom;
             utilisateurExistant.Pseudonyme = vm.Pseudonyme;
             utilisateurExistant.Courriel = vm.Courriel;
+            utilisateurExistant.InfoLettre = vm.InfoLettre;
 
             _context.Update(utilisateurExistant);
             await _context.SaveChangesAsync();

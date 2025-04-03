@@ -6,6 +6,7 @@ namespace TP3.Models
     {
         public int Id { get; set; }
         [StringLength(100)]
+
         public required string Prenom { get; set; }
         [StringLength(100)]
         public required string Nom { get; set; }
@@ -13,6 +14,8 @@ namespace TP3.Models
         public required string Pseudonyme { get; set; }
         [StringLength(100)]
         public string? Courriel { get; set; }
+        public bool InfoLettre { get; set; }
+
         [StringLength(100)]
         public required string MotDePasseActuel { get; set; }
     }
