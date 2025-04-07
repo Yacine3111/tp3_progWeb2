@@ -40,31 +40,25 @@ namespace TP3.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UtilisateursCreateViewModel vm)
+        public async Task<IActionResult> Create([Bind("Id", "Prenom", "Nom", "Pseudonyme", "Courriel", "InfoLettre", "MotDePasseNouveau", "MotDePasseConfirmation")] UtilisateursCreateViewModel vm)
         {
-            bool hasError = false;
-
-            if (!ModelState.IsValid)
-            {
-                hasError = true;
-            }
 
             var utilisateurs = await _context.Utilisateurs.ToListAsync();
 
 
-            if (utilisateurs.Any(u => u.Pseudonyme == vm.Pseudonyme))
+            if (utilisateurs.Any(u => string.Equals(u.Pseudonyme, vm.Pseudonyme, StringComparison.OrdinalIgnoreCase)))
             {
                 ModelState.AddModelError(nameof(UtilisateursCreateViewModel.Pseudonyme), "Ce pseudonyme est déjà utilisé.");
-                hasError = true;
+
             }
 
             if (utilisateurs.Any(u => u.Courriel == vm.Courriel && vm.Courriel != null))
             {
                 ModelState.AddModelError(nameof(UtilisateursCreateViewModel.Courriel), "Ce courriel est déjà utilisé.");
-                hasError = true;
+
             }
 
-            if (hasError)
+            if (!ModelState.IsValid)
             {
                 return View(vm);
             }
@@ -113,29 +107,25 @@ namespace TP3.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, UtilisateursEditViewModel vm)
+        public async Task<IActionResult> Edit(int id, [Bind("Id", "Prenom", "Nom", "Pseudonyme", "Courriel", "InfoLettre")] UtilisateursEditViewModel vm)
         {
-            bool hasError = false;
-            if (!ModelState.IsValid)
-            {
-                hasError = true;
-            }
+
 
             var utilisateurs = await _context.Utilisateurs.ToListAsync();
 
             if (utilisateurs.Any(u => u.Pseudonyme == vm.Pseudonyme && u.Id != vm.Id))
             {
                 ModelState.AddModelError(nameof(UtilisateursCreateViewModel.Pseudonyme), "Ce pseudonyme est déjà utilisé.");
-                hasError = true;
+
             }
 
             if (utilisateurs.Any(u => u.Courriel == vm.Courriel && u.Id != vm.Id && vm.Courriel != null))
             {
                 ModelState.AddModelError(nameof(UtilisateursCreateViewModel.Courriel), "Ce courriel est déjà utilisé.");
-                hasError = true;
+
             }
 
-            if (hasError)
+            if (!ModelState.IsValid)
             {
                 return View(vm);
             }
@@ -184,13 +174,32 @@ namespace TP3.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPassword(int id, UtilisateursEditPasswordViewModel vm)
+        public async Task<IActionResult> EditPassword(int id, [Bind("Id", "MotDePasseActuel", "MotDePasseNouveau", "MotDePasseConfirmation")] UtilisateursEditPasswordViewModel vm)
         {
+
+
             var utilisateurExistant = _context.Utilisateurs.Find(vm.Id);
 
             if (utilisateurExistant == null)
             {
                 return NotFound();
+            }
+
+            if (utilisateurExistant.MotDePasseActuel != vm.MotDePasseActuel)
+            {
+                ModelState.AddModelError(nameof(UtilisateursEditPasswordViewModel.MotDePasseActuel), "Le mot de passe actuel est différent.");
+
+            }
+
+            if (utilisateurExistant.MotDePasseActuel == vm.MotDePasseNouveau)
+            {
+                ModelState.AddModelError(nameof(UtilisateursEditPasswordViewModel.MotDePasseNouveau), "Le nouveau mot de passe doit être différent.");
+
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
             }
 
             utilisateurExistant.MotDePasseActuel = vm.MotDePasseNouveau;
