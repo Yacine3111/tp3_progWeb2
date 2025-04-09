@@ -23,6 +23,7 @@
                 context.Response.Redirect(_locationPath + "/" + context.Response.StatusCode);
             }
         }
+
     }
     public static class StatusCodeRedirectMiddlewareExtensions
     {
